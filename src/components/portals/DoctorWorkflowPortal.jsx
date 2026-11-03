@@ -24,9 +24,8 @@ export default function DoctorWorkflowPortal({
 }) {
   const { t, language } = useLanguage();
 
-  // Active navigation tab (Pages 1 to 5 + OP Queue)
-  // 'dashboard' (Page 2), 'registration' (Page 1), 'schedule' (Page 3), 'attendance' (Page 4), 'profile' (Page 5), 'op_queue'
-  const [activeTab, setActiveTab] = useState('dashboard');
+  // Active navigation tab: 'attendance', 'profile', 'schedule', 'op_queue', 'registration'
+  const [activeTab, setActiveTab] = useState('attendance');
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   // Active Doctor fallback
@@ -175,41 +174,48 @@ export default function DoctorWorkflowPortal({
   const [consultLabTests, setConsultLabTests] = useState('Complete Blood Picture (CBC)');
   const [consultNotes, setConsultNotes] = useState('Drink plenty of boiled water. Review in 5 days if fever persists.');
 
-  // Camera stream lifecycle
-  useEffect(() => {
-    let localStream = null;
-    if (activeTab === 'dashboard' || activeTab === 'attendance') {
-      if (typeof navigator !== 'undefined' && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ video: { width: 480, height: 360 } })
-          .then((s) => {
-            localStream = s;
-            setCameraStream(s);
-            setCameraActive(true);
-            if (videoRef.current) {
-              videoRef.current.srcObject = s;
-              videoRef.current.play().catch(() => {});
-            }
-          })
-          .catch((err) => {
-            console.warn('Webcam permission not granted or no webcam available, using chamber preview fallback', err);
-            setCameraActive(false);
-          });
+  // Manual Doctor Camera Control (Automatic camera disabled - doctor explicitly clicks to take picture)
+  const startCamera = async () => {
+    if (typeof navigator !== 'undefined' && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 480, height: 360 } });
+        setCameraStream(stream);
+        setCameraActive(true);
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          videoRef.current.play().catch(() => {});
+        }
+      } catch (err) {
+        console.warn('Camera access denied or unavailable:', err);
+        alert('Could not access camera. Please allow camera permissions in your browser to take your photo.');
       }
     }
+  };
 
-    return () => {
-      if (localStream) {
-        localStream.getTracks().forEach(track => track.stop());
-      }
-    };
-  }, [activeTab]);
+  const stopCamera = () => {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(track => track.stop());
+      setCameraStream(null);
+    }
+    setCameraActive(false);
+  };
 
+  // Keep videoRef in sync when camera becomes active
   useEffect(() => {
-    if (videoRef.current && cameraStream) {
+    if (videoRef.current && cameraStream && cameraActive) {
       videoRef.current.srcObject = cameraStream;
       videoRef.current.play().catch(() => {});
     }
   }, [cameraStream, cameraActive]);
+
+  // Clean up any running stream when component unmounts
+  useEffect(() => {
+    return () => {
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [cameraStream]);
 
   // Live clock
   useEffect(() => {
@@ -263,6 +269,9 @@ export default function DoctorWorkflowPortal({
       capturedDataUrl = currentDoc.avatar;
     }
 
+    // Turn camera off after capturing picture
+    stopCamera();
+
     setTimeout(() => {
       if (store) {
         const result = store.submitDoctorHourlyCheckIn(currentDoc.id, {
@@ -274,7 +283,7 @@ export default function DoctorWorkflowPortal({
 
         setIsVerifying(false);
         if (result.success) {
-          setLastVerifiedAlert('✅ Live Chamber Presence Verified via GPS Geofence! Next verification countdown reset to 60 min.');
+          setLastVerifiedAlert('✅ Doctor Picture & Chamber GPS Geofence Verified! Attendance recorded.');
           setTimeout(() => setLastVerifiedAlert(null), 5000);
         }
       }
@@ -389,17 +398,17 @@ export default function DoctorWorkflowPortal({
           </div>
         </div>
 
-        {/* Sidebar Nav Items (Pages 1 to 5 + OP Queue) */}
+        {/* Sidebar Nav Items */}
         <div className="py-3 flex-grow-1">
           
-          {/* PAGE 2: DASHBOARD */}
+          {/* PAGE 4: LIVE ATTENDANCE & GPS */}
           <button
             type="button"
-            className={`doc-nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
-            onClick={() => setActiveTab('dashboard')}
+            className={`doc-nav-item ${activeTab === 'attendance' ? 'active' : ''}`}
+            onClick={() => setActiveTab('attendance')}
           >
-            <Stethoscope size={18} />
-            <span>Dashboard</span>
+            <Camera size={18} />
+            <span>Attendance & Photo</span>
           </button>
 
           {/* PAGE 5: DOCTOR PROFILE */}
@@ -420,16 +429,6 @@ export default function DoctorWorkflowPortal({
           >
             <Calendar size={18} />
             <span>Duty Schedule</span>
-          </button>
-
-          {/* PAGE 4: LIVE ATTENDANCE & GPS */}
-          <button
-            type="button"
-            className={`doc-nav-item ${activeTab === 'attendance' ? 'active' : ''}`}
-            onClick={() => setActiveTab('attendance')}
-          >
-            <Camera size={18} />
-            <span>Attendance</span>
           </button>
 
           {/* LEAVE REQUESTS (MATCHES FIGMA DESIGN SHEET) */}
@@ -684,484 +683,6 @@ export default function DoctorWorkflowPortal({
         )}
 
         {/* ========================================================
-            PAGE 2: DOCTOR DASHBOARD VIEW (MATCHES FIGMA DESIGN SHEET)
-            ======================================================== */}
-        {activeTab === 'dashboard' && (
-          <div>
-            
-            {/* TOP 3 STAT CARDS (EXACT MATCH TO DESIGN SHEET) + 4th QUEUE CARD */}
-            <div className="row g-3 mb-4">
-              
-              {/* Card 1: Today's Duty */}
-              <div className="col-12 col-sm-6 col-lg-3">
-                <div className="doc-metric-card h-100">
-                  <div className="doc-metric-icon bg-primary bg-opacity-10 text-primary">
-                    <Stethoscope size={24} />
-                  </div>
-                  <div>
-                    <div className="text-muted small fw-bold">Today's Duty</div>
-                    <div className="fw-bold fs-5 text-dark lh-sm">{currentDoc.dutyHours || '09:00 AM – 05:00 PM'}</div>
-                    <div className="text-muted small">({currentDoc.department || 'General Medicine'})</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Card 2: Next Check-in */}
-              <div className="col-12 col-sm-6 col-lg-3">
-                <div className="doc-metric-card h-100">
-                  <div className="doc-metric-icon bg-success bg-opacity-10 text-success">
-                    <Calendar size={24} />
-                  </div>
-                  <div>
-                    <div className="text-muted small fw-bold">Next Check-in</div>
-                    <div className="fw-bold fs-5 text-success lh-sm">{currentDoc.nextCheckIn || 'in 58 min'}</div>
-                    <div className="text-muted small">(10:00 AM)</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Card 3: Last Updated */}
-              <div className="col-12 col-sm-6 col-lg-3">
-                <div className="doc-metric-card h-100">
-                  <div className="doc-metric-icon bg-info bg-opacity-10 text-info">
-                    <CheckCircle2 size={24} />
-                  </div>
-                  <div>
-                    <div className="text-muted small fw-bold">Last Updated</div>
-                    <div className="fw-bold fs-5 text-dark lh-sm">{currentDoc.lastCheckInTime || '09:02 AM'}</div>
-                    <div className="text-muted small">02 Nov 2026</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Card 4: Waiting Patients / Queue */}
-              <div className="col-12 col-sm-6 col-lg-3">
-                <div className="doc-metric-card h-100">
-                  <div className="doc-metric-icon bg-warning bg-opacity-10 text-warning">
-                    <Users size={24} />
-                  </div>
-                  <div>
-                    <div className="text-muted small fw-bold">Waiting Patients</div>
-                    <div className="fw-bold fs-5 text-dark lh-sm">{waitingAppts.length} In Queue</div>
-                    <div className="text-muted small">Completed: {completedAppts.length} Today</div>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
-            {/* Middle Row: Weekly Duty Schedule Preview + Quick Actions */}
-            <div className="row g-4 mb-4">
-              
-              {/* Weekly Duty Schedule Preview (Matches Design Sheet Left Column) */}
-              <div className="col-lg-8">
-                <div className="card border-0 shadow-sm rounded-4 h-100">
-                  <div className="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom">
-                    <div className="d-flex align-items-center gap-2">
-                      <Calendar size={18} className="text-primary" />
-                      <h6 className="fw-bold mb-0 text-dark">Weekly Duty Schedule</h6>
-                    </div>
-                    <button
-                      type="button"
-                      className="btn btn-link btn-sm text-decoration-none text-primary p-0 fw-bold d-flex align-items-center gap-1"
-                      onClick={() => setActiveTab('schedule')}
-                    >
-                      <span>View Full Schedule</span>
-                      <ArrowRight size={14} />
-                    </button>
-                  </div>
-
-                  <div className="card-body p-0">
-                    <div className="table-responsive">
-                      <table className="table table-hover align-middle mb-0">
-                        <thead className="table-light small">
-                          <tr>
-                            <th className="ps-4">Day</th>
-                            <th>Duty Timing</th>
-                            <th>Department</th>
-                            <th className="text-end pe-4">Duty Status</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {[
-                            { day: 'Mon', dutyTime: '09:00 AM – 05:00 PM', department: 'General Medicine' },
-                            { day: 'Tue', dutyTime: '09:00 AM – 05:00 PM', department: 'General Medicine' },
-                            { day: 'Wed', dutyTime: '09:00 AM – 05:00 PM', department: 'General Medicine' },
-                            { day: 'Thu', dutyTime: '09:00 AM – 05:00 PM', department: 'General Medicine' },
-                            { day: 'Fri', dutyTime: '09:00 AM – 01:00 PM', department: 'OPD' },
-                            { day: 'Sat', dutyTime: '09:00 AM – 01:00 PM', department: 'OPD' },
-                            { day: 'Sun', dutyTime: 'Holiday', department: '-' }
-                          ].map((sched, idx) => {
-                            const isToday = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][new Date().getDay()] === sched.day;
-                            const isHoliday = sched.dutyTime.toLowerCase().includes('holiday') || sched.dutyTime === 'Off';
-
-                            return (
-                              <tr key={idx} className={isToday ? 'table-primary table-opacity-10 fw-semibold' : ''}>
-                                <td className="ps-4">
-                                  <span className={`badge ${isToday ? 'bg-primary' : 'bg-light text-dark border'}`}>
-                                    {sched.day}
-                                  </span>
-                                  {isToday && <span className="ms-2 text-primary small">(Today)</span>}
-                                </td>
-                                <td className="text-dark">{sched.dutyTime}</td>
-                                <td>{sched.department}</td>
-                                <td className="text-end pe-4">
-                                  {isHoliday ? (
-                                    <span className="badge bg-secondary-subtle text-secondary">Weekly Off</span>
-                                  ) : (
-                                    <span className="badge bg-success-subtle text-success">Active Shift</span>
-                                  )}
-                                </td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Quick Actions 2x2 Grid (Matches Design Sheet Right Column) */}
-              <div className="col-lg-4">
-                <div className="card border-0 shadow-sm rounded-4 h-100">
-                  <div className="card-header bg-white py-3 border-bottom">
-                    <h6 className="fw-bold mb-0 text-dark">Quick Actions</h6>
-                  </div>
-                  <div className="card-body p-3">
-                    <div className="row g-2">
-                      
-                      {/* Action 1: Upload Hourly Photo */}
-                      <div className="col-6">
-                        <div
-                          className="doc-action-tile h-100"
-                          onClick={() => {
-                            setActiveTab('attendance');
-                            window.scrollTo({ top: 300, behavior: 'smooth' });
-                          }}
-                        >
-                          <div className="bg-primary bg-opacity-10 text-primary p-3 rounded-circle mb-1">
-                            <Camera size={22} />
-                          </div>
-                          <span className="fw-bold small text-dark">Upload Hourly Photo</span>
-                          <span className="text-muted" style={{ fontSize: '0.72rem' }}>Camera & GPS</span>
-                        </div>
-                      </div>
-
-                      {/* Action 2: Request Leave */}
-                      <div className="col-6">
-                        <div
-                          className="doc-action-tile h-100"
-                          onClick={() => setLeaveModalOpen(true)}
-                        >
-                          <div className="bg-warning bg-opacity-10 text-warning p-3 rounded-circle mb-1">
-                            <Calendar size={22} />
-                          </div>
-                          <span className="fw-bold small text-dark">Request Leave</span>
-                          <span className="text-muted" style={{ fontSize: '0.72rem' }}>Apply off-duty</span>
-                        </div>
-                      </div>
-
-                      {/* Action 3: View Attendance */}
-                      <div className="col-6">
-                        <div
-                          className="doc-action-tile h-100"
-                          onClick={() => setActiveTab('attendance')}
-                        >
-                          <div className="bg-info bg-opacity-10 text-info p-3 rounded-circle mb-1">
-                            <FileText size={22} />
-                          </div>
-                          <span className="fw-bold small text-dark">View Attendance</span>
-                          <span className="text-muted" style={{ fontSize: '0.72rem' }}>Past GPS logs</span>
-                        </div>
-                      </div>
-
-                      {/* Action 4: View Reports / OP Queue */}
-                      <div className="col-6">
-                        <div
-                          className="doc-action-tile h-100"
-                          onClick={() => setActiveTab('op_queue')}
-                        >
-                          <div className="bg-success bg-opacity-10 text-success p-3 rounded-circle mb-1">
-                            <BarChart3 size={22} />
-                          </div>
-                          <span className="fw-bold small text-dark">View Reports</span>
-                          <span className="text-muted" style={{ fontSize: '0.72rem' }}>{waitingAppts.length} In Queue</span>
-                        </div>
-                      </div>
-
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
-            {/* Bottom Row: 3 FIGMA DESIGN CARDS: My Profile | Hourly Attendance | Schedule Overview */}
-            <div className="row g-3 mb-4">
-              
-              {/* CARD 1: MY PROFILE (Bottom-Left in Figma Design Sheet) */}
-              <div className="col-lg-4 col-md-6">
-                <div className="card border-0 shadow-sm rounded-4 p-3 h-100 bg-white">
-                  <div className="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-                    <div className="d-flex align-items-center gap-2">
-                      <div className="bg-primary bg-opacity-10 text-primary p-1 rounded-circle">
-                        <User size={16} />
-                      </div>
-                      <h6 className="fw-bold mb-0 text-dark">My Profile</h6>
-                    </div>
-                    <button
-                      type="button"
-                      className="btn btn-outline-primary btn-sm py-0 px-2 rounded-pill d-flex align-items-center gap-1"
-                      style={{ fontSize: '0.75rem' }}
-                      onClick={() => setEditProfileModalOpen(true)}
-                    >
-                      <Edit3 size={12} />
-                      <span>Edit Profile</span>
-                    </button>
-                  </div>
-
-                  <div className="row g-2 align-items-center">
-                    <div className="col-4 text-center">
-                      <img
-                        src={currentDoc.avatar}
-                        alt={currentDoc.name}
-                        className="rounded-circle border border-2 border-primary shadow-sm mb-1"
-                        width="70"
-                        height="70"
-                        style={{ objectFit: 'cover' }}
-                      />
-                      <div>
-                        {isOnline ? (
-                          <span className="doc-pill-status doc-pill-online" style={{ fontSize: '0.7rem', padding: '2px 8px' }}>
-                            ● Online
-                          </span>
-                        ) : (
-                          <span className="doc-pill-status doc-pill-offline" style={{ fontSize: '0.7rem', padding: '2px 8px' }}>
-                            ⚪ Offline
-                          </span>
-                        )}
-                      </div>
-                      <button
-                        type="button"
-                        className="btn btn-primary btn-sm py-0 px-1 mt-2 w-100 shadow-sm"
-                        style={{ fontSize: '0.72rem' }}
-                        onClick={() => setEditProfileModalOpen(true)}
-                      >
-                        Change Photo
-                      </button>
-                    </div>
-
-                    <div className="col-8 ps-2" style={{ fontSize: '0.82rem' }}>
-                      <h6 className="fw-bold text-dark mb-1 lh-sm">{currentDoc.name}</h6>
-                      
-                      <div className="d-flex justify-content-between py-1 border-bottom">
-                        <span className="text-muted">Doctor ID :</span>
-                        <strong className="text-dark">{currentDoc.id}</strong>
-                      </div>
-                      <div className="d-flex justify-content-between py-1 border-bottom">
-                        <span className="text-muted">Designation :</span>
-                        <strong className="text-dark text-truncate ms-1" title={currentDoc.designation}>{currentDoc.designation}</strong>
-                      </div>
-                      <div className="d-flex justify-content-between py-1 border-bottom">
-                        <span className="text-muted">Department :</span>
-                        <strong className="text-dark">{currentDoc.department}</strong>
-                      </div>
-                      <div className="d-flex justify-content-between py-1 border-bottom">
-                        <span className="text-muted">Qualification :</span>
-                        <strong className="text-primary">{currentDoc.qualification}</strong>
-                      </div>
-                      <div className="d-flex justify-content-between py-1 border-bottom">
-                        <span className="text-muted">Specialization :</span>
-                        <span className="text-dark">{currentDoc.specialization}</span>
-                      </div>
-                      <div className="d-flex justify-content-between py-1 border-bottom">
-                        <span className="text-muted">Experience :</span>
-                        <span className="text-dark">{currentDoc.experience || '8 Years'}</span>
-                      </div>
-                      <div className="d-flex justify-content-between pt-1">
-                        <span className="text-muted">Hospital :</span>
-                        <span className="text-dark text-truncate ms-1" title={currentDoc.hospitalName}>Govt. MGM Hospital</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* CARD 2: HOURLY ATTENDANCE (Bottom-Middle in Figma Design Sheet) */}
-              <div className="col-lg-4 col-md-6">
-                <div className="card border-0 shadow-sm rounded-4 p-3 h-100 bg-white">
-                  <div className="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
-                    <div className="d-flex align-items-center gap-2">
-                      <div className="bg-primary bg-opacity-10 text-primary p-1 rounded-circle">
-                        <Camera size={16} />
-                      </div>
-                      <h6 className="fw-bold mb-0 text-dark">Hourly Attendance</h6>
-                    </div>
-                    <span className="badge bg-success-subtle text-success py-1 px-2" style={{ fontSize: '0.7rem' }}>
-                      GPS Geofence
-                    </span>
-                  </div>
-
-                  <div className="alert alert-info py-1 px-2 small mb-2 d-flex align-items-center gap-2 rounded-2" style={{ fontSize: '0.74rem' }}>
-                    <AlertCircle size={14} className="text-info flex-shrink-0" />
-                    <span>Please capture a fresh photo with GPS location for verification.</span>
-                  </div>
-
-                  <div className="row g-2 align-items-center">
-                    {/* Live Camera Viewport */}
-                    <div className="col-6">
-                      <div className="doc-mini-camera-box">
-                        <video
-                          ref={videoRef}
-                          autoPlay
-                          playsInline
-                          muted
-                          style={{
-                            display: cameraActive ? 'block' : 'none',
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover'
-                          }}
-                        />
-                        <img
-                          src={capturedSelfie || currentDoc.avatar}
-                          alt="Doctor Live Camera"
-                          style={{
-                            display: !cameraActive ? 'block' : 'none',
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover'
-                          }}
-                        />
-                        <div className="doc-live-badge" style={{ fontSize: '0.65rem', padding: '1px 6px' }}>
-                          ● LIVE
-                        </div>
-                        <div className="doc-mini-reticle" />
-                      </div>
-                    </div>
-
-                    {/* Location Details & Timestamp */}
-                    <div className="col-6 ps-2" style={{ fontSize: '0.78rem' }}>
-                      <div className="d-flex align-items-center gap-1 fw-bold text-dark mb-1">
-                        <MapPin size={13} className="text-primary flex-shrink-0" />
-                        <span>Location Details</span>
-                      </div>
-                      <div className="text-muted ms-2 lh-sm">
-                        <div>Lat: <strong className="text-dark">17.9818</strong></div>
-                        <div>Lng: <strong className="text-dark">79.5960</strong></div>
-                        <div>Accuracy: <strong className="text-dark">±5 m</strong></div>
-                        <div className="text-success fw-bold mt-1 d-flex align-items-center gap-1">
-                          <Check size={12} /> Within Hospital Area
-                        </div>
-                      </div>
-
-                      <div className="d-flex align-items-center gap-1 fw-bold text-dark mt-2 mb-1">
-                        <Clock size={13} className="text-secondary flex-shrink-0" />
-                        <span>Timestamp</span>
-                      </div>
-                      <div className="text-muted ms-2 lh-sm">
-                        <strong className="text-dark">{currentTimeStr || '02 Nov 2026, 10:02 AM'}</strong>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Capture & Submit Button */}
-                  <button
-                    type="button"
-                    className="btn btn-primary w-100 py-2 mt-3 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-sm"
-                    style={{ fontSize: '0.85rem' }}
-                    onClick={handleCaptureLiveAttendance}
-                    disabled={isVerifying}
-                  >
-                    <Camera size={16} />
-                    <span>{isVerifying ? 'Verifying Presence...' : 'Capture & Submit'}</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* CARD 3: SCHEDULE OVERVIEW (Bottom-Right in Figma Design Sheet) */}
-              <div className="col-lg-4 col-md-12">
-                <div className="card border-0 shadow-sm rounded-4 p-3 h-100 bg-white">
-                  <div className="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
-                    <div className="d-flex align-items-center gap-2">
-                      <div className="bg-primary bg-opacity-10 text-primary p-1 rounded-circle">
-                        <Calendar size={16} />
-                      </div>
-                      <h6 className="fw-bold mb-0 text-dark">Schedule Overview</h6>
-                    </div>
-                    <select className="form-select form-select-sm py-0 px-2" style={{ width: 'auto', fontSize: '0.75rem' }}>
-                      <option>This Week</option>
-                      <option>Next Week</option>
-                    </select>
-                  </div>
-
-                  {/* Doctor Roster matching Figma Design Sheet */}
-                  <div className="d-flex flex-column gap-2" style={{ maxHeight: '250px', overflowY: 'auto' }}>
-                    {(doctors || [
-                      { id: 'DH-2026-001', name: 'Dr. Rajesh Kumar', department: 'General Medicine', onlineStatus: 'online', lastCheckInTime: '09:02 AM' },
-                      { id: 'DH-2026-002', name: 'Dr. Sneha Patel', department: 'Pediatrics', onlineStatus: 'offline', lastCheckInTime: '08:45 AM' },
-                      { id: 'DH-2026-003', name: 'Dr. Ahmed Khan', department: 'Cardiology', onlineStatus: 'in_consultation', lastCheckInTime: '09:10 AM' },
-                      { id: 'DH-2026-004', name: 'Dr. Priya Sharma', department: 'Gynecology', onlineStatus: 'on_leave', lastCheckInTime: '-' },
-                      { id: 'DH-2026-005', name: 'Dr. Vikram Singh', department: 'Orthopedics', onlineStatus: 'online', lastCheckInTime: '09:00 AM' }
-                    ]).slice(0, 5).map((doc, idx) => {
-                      const getStatusBadge = (status) => {
-                        switch (status) {
-                          case 'online':
-                            return <span className="doc-pill-status doc-pill-online">● Online</span>;
-                          case 'offline':
-                            return <span className="doc-pill-status doc-pill-offline">● Offline</span>;
-                          case 'in_consultation':
-                            return <span className="doc-pill-status doc-pill-consultation">● In Consultation</span>;
-                          case 'on_leave':
-                            return <span className="doc-pill-status doc-pill-leave">● On Leave</span>;
-                          default:
-                            return <span className="doc-pill-status doc-pill-offline">● Off Duty</span>;
-                        }
-                      };
-
-                      return (
-                        <div
-                          key={doc.id || idx}
-                          className="doc-peer-row p-1 rounded-2"
-                          style={{ cursor: 'pointer' }}
-                          onClick={() => onSwitchDoctor && onSwitchDoctor(doc.id)}
-                          title={`Click to switch active doctor to ${doc.name}`}
-                        >
-                          <div className="d-flex align-items-center gap-2">
-                            <img
-                              src={doc.avatar || 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=100'}
-                              alt={doc.name}
-                              className="rounded-circle"
-                              width="32"
-                              height="32"
-                              style={{ objectFit: 'cover' }}
-                            />
-                            <div>
-                              <div className="fw-bold text-dark lh-sm" style={{ fontSize: '0.8rem' }}>{doc.name}</div>
-                              <div className="text-muted" style={{ fontSize: '0.7rem' }}>{doc.department}</div>
-                            </div>
-                          </div>
-                          
-                          <div className="d-flex flex-column align-items-end">
-                            {getStatusBadge(doc.onlineStatus)}
-                            <div className="text-muted mt-1" style={{ fontSize: '0.68rem' }}>
-                              {String(doc.lastCheckInTime || '').split(' ')[0] || '-'}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
-          </div>
-        )}
-
-        {/* ========================================================
             PAGE 1: DOCTOR REGISTRATION (5 Comprehensive Sections)
             ======================================================== */}
         {activeTab === 'registration' && (
@@ -1172,8 +693,8 @@ export default function DoctorWorkflowPortal({
                 <h5 className="fw-bold text-dark mb-0">Government Hospital Doctor Registration</h5>
                 <small className="text-muted">Govt. Mahatma Gandhi Memorial (MGM) Hospital, Warangal &bull; Official Staff Onboarding</small>
               </div>
-              <button type="button" className="btn btn-sm btn-outline-secondary" onClick={() => setActiveTab('dashboard')}>
-                Back to Dashboard
+              <button type="button" className="btn btn-sm btn-outline-secondary" onClick={() => setActiveTab('attendance')}>
+                &larr; Back to Attendance
               </button>
             </div>
 
@@ -1739,13 +1260,17 @@ export default function DoctorWorkflowPortal({
               
               <div className="row g-4 align-items-center mb-4">
                 
-                {/* Camera Viewport (Fresh Live Capture Only - No Gallery Upload) */}
+                {/* Camera Viewport (Manual Control: Automatic camera is OFF, doctor clicks when they want to take picture) */}
                 <div className="col-lg-5 text-center">
-                  <div className="doc-camera-viewport mb-3 shadow" style={{ maxWidth: '380px', height: '280px' }}>
-                    <div className="doc-live-badge">
-                      <span style={{ fontSize: '0.55rem' }}>●</span> LIVE CAMERA
-                    </div>
+                  <div className="doc-camera-viewport mb-3 shadow position-relative" style={{ maxWidth: '380px', height: '280px', background: '#0f172a' }}>
+                    
+                    {cameraActive && (
+                      <div className="doc-live-badge" style={{ backgroundColor: '#10b981' }}>
+                        <span style={{ fontSize: '0.55rem' }}>●</span> CAMERA ON
+                      </div>
+                    )}
 
+                    {/* Live Video (Visible ONLY when doctor clicks Turn On Camera) */}
                     <video
                       ref={videoRef}
                       autoPlay
@@ -1758,39 +1283,84 @@ export default function DoctorWorkflowPortal({
                         objectFit: 'cover'
                       }}
                     />
+
+                    {/* View when Camera is OFF */}
                     {!cameraActive && (
-                      <img
-                        src={capturedSelfie || currentDoc.avatar}
-                        alt="Doctor Camera View"
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      />
+                      <div className="d-flex flex-column align-items-center justify-content-center h-100 text-white p-3">
+                        {capturedSelfie ? (
+                          <div className="position-relative w-100 h-100">
+                            <img
+                              src={capturedSelfie}
+                              alt="Doctor Captured Picture"
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
+                            <div className="position-absolute top-0 start-0 m-2 badge bg-success shadow-sm">
+                              ✓ Verified Photo
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="text-center">
+                            <div className="bg-white bg-opacity-10 rounded-circle p-3 d-inline-flex mb-2">
+                              <Camera size={38} className="text-white-50" />
+                            </div>
+                            <h6 className="fw-bold text-white mb-1">Camera is Off</h6>
+                            <p className="text-white-50 small mb-0 px-3" style={{ fontSize: '0.78rem' }}>
+                              Automatic camera is disabled. Click below whenever you want to take your verification picture.
+                            </p>
+                          </div>
+                        )}
+                      </div>
                     )}
 
-                    <div className="doc-face-reticle" />
+                    {cameraActive && <div className="doc-face-reticle" />}
                   </div>
 
-                  <button
-                    type="button"
-                    className="btn btn-primary btn-lg w-100 py-3 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-sm"
-                    style={{ maxWidth: '380px', margin: '0 auto' }}
-                    onClick={handleCaptureLiveAttendance}
-                    disabled={isVerifying}
-                  >
-                    {isVerifying ? (
-                      <>
-                        <RefreshCw size={20} className="spin" />
-                        <span>Verifying GPS Geofence & Facial Liveness...</span>
-                      </>
-                    ) : (
-                      <>
+                  {/* Manual Camera Action Controls */}
+                  <div className="d-flex flex-column gap-2" style={{ maxWidth: '380px', margin: '0 auto' }}>
+                    {!cameraActive ? (
+                      <button
+                        type="button"
+                        className="btn btn-primary btn-lg w-100 py-3 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-sm"
+                        onClick={startCamera}
+                      >
                         <Camera size={22} />
-                        <span>Start Duty & Capture Live Verification</span>
-                      </>
+                        <span>{capturedSelfie ? 'Turn On Camera to Retake Picture' : 'Turn On Camera to Take Picture'}</span>
+                      </button>
+                    ) : (
+                      <div className="d-flex gap-2">
+                        <button
+                          type="button"
+                          className="btn btn-success btn-lg flex-grow-1 py-3 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-sm"
+                          onClick={handleCaptureLiveAttendance}
+                          disabled={isVerifying}
+                        >
+                          {isVerifying ? (
+                            <>
+                              <RefreshCw size={20} className="spin" />
+                              <span>Verifying GPS...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Camera size={22} />
+                              <span>Take Picture & Submit</span>
+                            </>
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-outline-secondary px-3 fw-bold"
+                          onClick={stopCamera}
+                          title="Turn Off Camera"
+                        >
+                          <X size={20} />
+                        </button>
+                      </div>
                     )}
-                  </button>
-                  <small className="text-muted mt-2 d-block" style={{ fontSize: '0.75rem' }}>
-                    Fresh camera capture only &bull; Gallery uploads strictly prohibited for duty compliance.
-                  </small>
+
+                    <small className="text-muted mt-1 d-block" style={{ fontSize: '0.75rem' }}>
+                      Manual photo capture &bull; The camera only turns on when you choose to click.
+                    </small>
+                  </div>
                 </div>
 
                 {/* GPS Coordinates & Verification Details */}
@@ -2199,10 +1769,10 @@ export default function DoctorWorkflowPortal({
                 className="btn btn-primary fw-bold w-100"
                 onClick={() => {
                   setRegSuccessModalOpen(false);
-                  setActiveTab('dashboard');
+                  setActiveTab('attendance');
                 }}
               >
-                Back to Dashboard
+                Back to Attendance
               </button>
             </div>
           </div>
