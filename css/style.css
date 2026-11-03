@@ -1,0 +1,893 @@
+/* ==========================================================================
+   Arogya Care: Modern Digital Hospital & Health Record System
+   Clean, Accessible, High-Readability Healthcare Design System
+   ========================================================================== */
+
+:root {
+  --primary-navy: #0f2b48;
+  --primary-blue: #0284c7;
+  --primary-blue-dark: #0369a1;
+  --primary-blue-light: #e0f2fe;
+  --health-teal: #0d9488;
+  --health-teal-dark: #0f766e;
+  --health-teal-light: #ccfbf1;
+  --health-emerald: #10b981;
+  --health-emerald-light: #d1fae5;
+  --warning-amber: #f59e0b;
+  --warning-amber-light: #fef3c7;
+  --danger-crimson: #ef4444;
+  --danger-bg: #fee2e2;
+  --blood-red: #dc2626;
+  --blood-red-light: #fee2e2;
+  --neutral-bg: #f8fafc;
+  --neutral-card: #ffffff;
+  --neutral-border: #e2e8f0;
+  --neutral-text-main: #1e293b;
+  --neutral-text-muted: #64748b;
+  --font-family-base: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --base-font-size: 17.5px; /* Increased comfortable readable font size */
+  --card-radius: 14px;
+  --box-shadow-soft: 0 4px 20px rgba(15, 43, 72, 0.06);
+  --box-shadow-hover: 0 10px 30px rgba(15, 43, 72, 0.12);
+}
+
+html {
+  font-size: var(--base-font-size);
+}
+
+body {
+  font-family: var(--font-family-base);
+  background-color: var(--neutral-bg);
+  color: var(--neutral-text-main);
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Top Utility Bar (Clean White Background) --- */
+.top-utility-bar {
+  background-color: #ffffff;
+  color: #334155;
+  font-size: 0.92rem;
+  padding: 8px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.font-scaler-btn {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #1e293b;
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.font-scaler-btn:hover, .font-scaler-btn.active {
+  background: #0284c7;
+  border-color: #0284c7;
+  color: #ffffff;
+}
+
+/* --- Clean Modern Navigation Header --- */
+.modern-navbar {
+  background-color: #ffffff;
+  border-bottom: 1px solid var(--neutral-border);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  padding: 14px 0;
+}
+
+.brand-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.brand-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #0284c7, #0d9488);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+}
+
+.brand-title-group h1 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--primary-navy);
+  margin: 0;
+  line-height: 1.1;
+  letter-spacing: -0.3px;
+}
+
+.brand-title-group .sub-title {
+  font-size: 0.88rem;
+  color: var(--neutral-text-muted);
+  font-weight: 500;
+  margin: 0;
+}
+
+/* --- Navigation Module Tabs (OP, Rooms, Blood Bank, Doctors) --- */
+.nav-pills-modern {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  background: #f1f5f9;
+  padding: 6px;
+  border-radius: 12px;
+}
+
+.nav-pills-modern .nav-link {
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-weight: 600;
+  font-size: 0.98rem;
+  color: #475569;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.nav-pills-modern .nav-link:hover {
+  color: var(--primary-blue);
+  background-color: #e2e8f0;
+}
+
+.nav-pills-modern .nav-link.active {
+  background-color: var(--primary-blue);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+}
+
+/* --- Role Switcher Bar --- */
+.demo-role-bar {
+  background-color: #f8fafc;
+  border-bottom: 1px solid var(--neutral-border);
+  padding: 8px 0;
+  font-size: 0.92rem;
+}
+
+.role-pill-btn {
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: var(--primary-navy);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.role-pill-btn:hover {
+  background: #e2e8f0;
+}
+
+.role-pill-btn.active {
+  background: var(--primary-navy);
+  color: #ffffff;
+  border-color: var(--primary-navy);
+  box-shadow: 0 2px 8px rgba(15, 43, 72, 0.2);
+}
+
+/* --- Modern Healthcare Cards --- */
+.card-healthcare {
+  background: var(--neutral-card);
+  border-radius: var(--card-radius);
+  border: 1px solid var(--neutral-border);
+  box-shadow: var(--box-shadow-soft);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+}
+
+.card-header-healthcare {
+  background-color: #ffffff;
+  border-bottom: 1px solid var(--neutral-border);
+  padding: 16px 22px;
+  font-weight: 700;
+  font-size: 1.12rem;
+  color: var(--primary-navy);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* --- Doctor Online / Offline Availability Badge --- */
+.doctor-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  border-radius: 30px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.doctor-status-online {
+  background-color: #d1fae5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.doctor-status-offline {
+  background-color: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #cbd5e1;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dot-online {
+  background-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.35);
+  animation: pulseDot 2s infinite;
+}
+
+.status-dot-offline {
+  background-color: #94a3b8;
+}
+
+@keyframes pulseDot {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+/* --- Blood Bank Inventory Cards --- */
+.blood-inventory-card {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #fecaca;
+  padding: 16px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.blood-inventory-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(220, 38, 38, 0.1);
+}
+
+.blood-drop-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #fee2e2;
+  color: #dc2626;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 10px;
+}
+
+.blood-group-title {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #991b1b;
+  margin-bottom: 2px;
+}
+
+.blood-units-count {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #1e293b;
+  line-height: 1;
+}
+
+/* --- Hospital Room & Bed Booking Cards --- */
+.room-card {
+  background: #ffffff;
+  border-radius: var(--card-radius);
+  border: 1px solid var(--neutral-border);
+  box-shadow: var(--box-shadow-soft);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.room-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--box-shadow-hover);
+}
+
+.room-header {
+  padding: 18px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-bottom: 1px solid var(--neutral-border);
+}
+
+.bed-capacity-bar {
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 10px 0 6px;
+}
+
+.bed-capacity-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #0284c7);
+  border-radius: 10px;
+}
+
+.amenity-tag {
+  background-color: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 0.84rem;
+  font-weight: 500;
+  display: inline-block;
+  margin: 2px 2px 2px 0;
+}
+
+/* --- Form Controls & Font Size Scaling --- */
+.form-label {
+  font-weight: 700;
+  color: #334155;
+  font-size: 1rem;
+  margin-bottom: 6px;
+}
+
+.form-control, .form-select {
+  border-color: #cbd5e1;
+  padding: 10px 14px;
+  font-size: 1.05rem;
+  border-radius: 10px;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.15);
+}
+
+.btn {
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 10px 20px;
+}
+
+.btn-sm {
+  font-size: 0.88rem;
+  padding: 6px 14px;
+}
+
+.btn-primary-custom {
+  background-color: var(--primary-blue);
+  border-color: var(--primary-blue);
+  color: #ffffff;
+}
+
+.btn-primary-custom:hover {
+  background-color: var(--primary-blue-dark);
+  border-color: var(--primary-blue-dark);
+  color: #ffffff;
+}
+
+/* --- Status Badges --- */
+.badge-status {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.badge-status-confirmed { background-color: var(--primary-blue-light); color: var(--primary-blue-dark); }
+.badge-status-waiting { background-color: #fef3c7; color: #92400e; }
+.badge-status-doctor { background-color: #ede9fe; color: #5b21b6; }
+.badge-status-completed { background-color: #d1fae5; color: #065f46; }
+.badge-status-cancelled { background-color: var(--danger-bg); color: var(--danger-crimson); }
+
+/* --- Printable OP Slip & Room Ticket --- */
+.op-slip-ticket {
+  background: #ffffff;
+  border: 2px dashed #0284c7;
+  border-radius: 14px;
+  padding: 26px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+}
+
+.op-token-banner {
+  background: linear-gradient(135deg, #0284c7, #0d9488);
+  color: white;
+  border-radius: 10px;
+  padding: 14px 20px;
+}
+
+.patient-avatar-frame {
+  width: 95px;
+  height: 95px;
+  border-radius: 50%;
+  border: 3px solid var(--primary-blue);
+  object-fit: cover;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+/* --- Camera & QR Containers --- */
+.camera-container {
+  background: #0f172a;
+  border-radius: 14px;
+  position: relative;
+  overflow: hidden;
+  max-width: 480px;
+  margin: 0 auto;
+  aspect-ratio: 4/3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.camera-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.camera-guide-overlay {
+  position: absolute;
+  top: 15%;
+  bottom: 15%;
+  left: 20%;
+  right: 20%;
+  border: 2px dashed rgba(255, 255, 255, 0.75);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.qr-scanner-box {
+  background: #000000;
+  border-radius: 14px;
+  position: relative;
+  overflow: hidden;
+  min-height: 280px;
+}
+
+.qr-scan-reticle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 220px;
+  height: 220px;
+  border: 2px solid #00ff88;
+  border-radius: 12px;
+  pointer-events: none;
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+}
+
+.qr-laser-line {
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background: #00ff88;
+  top: 0;
+  box-shadow: 0 0 8px #00ff88;
+  animation: qrLaserScan 2s ease-in-out infinite alternate;
+}
+
+@keyframes qrLaserScan {
+  0% { top: 0%; opacity: 0.8; }
+  100% { top: 100%; opacity: 0.8; }
+}
+
+/* --- Stats Widget --- */
+.stat-widget {
+  background: #ffffff;
+  border-radius: var(--card-radius);
+  padding: 20px;
+  border: 1px solid var(--neutral-border);
+  box-shadow: var(--box-shadow-soft);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.stat-icon-box {
+  width: 58px;
+  height: 58px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.7rem;
+}
+
+.stat-blue { background-color: var(--primary-blue-light); color: var(--primary-blue-dark); }
+.stat-teal { background-color: var(--health-teal-light); color: var(--health-teal-dark); }
+.stat-amber { background-color: #fef3c7; color: #b45309; }
+.stat-purple { background-color: #ede9fe; color: #6d28d9; }
+.stat-red { background-color: #fee2e2; color: #dc2626; }
+
+/* --- Footer --- */
+.modern-footer {
+  background-color: var(--primary-navy);
+  color: #cbd5e1;
+  font-size: 0.95rem;
+  margin-top: auto;
+  border-top: 4px solid var(--primary-blue);
+}
+
+.modern-footer a {
+  color: #93c5fd;
+  text-decoration: none;
+}
+
+.modern-footer a:hover {
+  text-decoration: underline;
+}
+
+/* High Contrast Mode */
+body.high-contrast {
+  --neutral-bg: #000000;
+  --neutral-card: #121212;
+  --neutral-border: #facc15;
+  --neutral-text-main: #ffffff;
+  --neutral-text-muted: #e2e8f0;
+  --primary-navy: #000000;
+  --primary-blue: #facc15;
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+body.high-contrast .card {
+  background-color: #121212 !important;
+  border: 2px solid #facc15 !important;
+  color: #ffffff !important;
+}
+
+/* ========================================================
+   DOCTOR WORKFLOW & PORTAL STYLES (Matches Govt Hospital Design)
+   ======================================================== */
+
+.doc-portal-wrapper {
+  background-color: #f8fafc;
+  min-height: 85vh;
+}
+
+.doc-sidebar {
+  background-color: #1e293b;
+  color: #e2e8f0;
+  width: 250px;
+  min-width: 250px;
+  transition: all 0.3s ease;
+}
+
+.doc-sidebar-brand {
+  padding: 1.25rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.doc-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 1.1rem;
+  color: #94a3b8;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  margin: 0.2rem 0.6rem;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  width: calc(100% - 1.2rem);
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.doc-nav-item:hover {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.doc-nav-item.active {
+  color: #ffffff;
+  background-color: #2563eb;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+}
+
+.doc-nav-badge {
+  background-color: #ef4444;
+  color: #ffffff;
+  font-size: 0.7rem;
+  padding: 2px 7px;
+  border-radius: 10px;
+  margin-left: auto;
+}
+
+.doc-status-pill-group {
+  background: #f1f5f9;
+  border-radius: 24px;
+  padding: 3px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #cbd5e1;
+}
+
+.doc-status-btn {
+  border: none;
+  background: transparent;
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.doc-status-btn.active-online {
+  background-color: #10b981;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+}
+
+.doc-status-btn.active-offline {
+  background-color: #64748b;
+  color: #ffffff;
+}
+
+.doc-metric-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.doc-metric-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.doc-camera-viewport {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  height: 240px;
+  background: #0f172a;
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 0 auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.doc-camera-viewport video,
+.doc-camera-viewport img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.doc-face-reticle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 130px;
+  height: 160px;
+  border: 2px dashed rgba(255, 255, 255, 0.7);
+  border-radius: 50% / 60%;
+  pointer-events: none;
+}
+
+.doc-live-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(220, 38, 38, 0.9);
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.doc-action-tile {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 1.1rem;
+  text-align: center;
+  transition: all 0.2s;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.doc-action-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
+  border-color: #93c5fd;
+}
+
+.doc-peer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0.25rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.doc-peer-row:last-child {
+  border-bottom: none;
+}
+
+/* Figma-Quality Doctor Management Website Additions */
+.doc-pill-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.doc-pill-online {
+  background-color: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.doc-pill-offline {
+  background-color: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+.doc-pill-consultation {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+.doc-pill-leave {
+  background-color: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.doc-pill-emergency {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+/* Registration Page Illustration Box */
+.doc-reg-hero-box {
+  background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  height: 100%;
+}
+
+.doc-reg-hero-illustration {
+  max-width: 260px;
+  width: 100%;
+  margin-bottom: 1.5rem;
+  filter: drop-shadow(0 10px 15px rgba(37, 99, 235, 0.15));
+}
+
+.doc-upload-box {
+  border: 2px dashed #93c5fd;
+  background-color: #f0f7ff;
+  border-radius: 12px;
+  padding: 1.25rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.doc-upload-box:hover {
+  background-color: #e0f2fe;
+  border-color: #3b82f6;
+}
+
+/* Mini Attendance Camera Viewport in Dashboard */
+.doc-mini-camera-box {
+  position: relative;
+  width: 100%;
+  height: 175px;
+  background: #0f172a;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.doc-mini-camera-box video,
+.doc-mini-camera-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.doc-mini-reticle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90px;
+  height: 110px;
+  border: 2px dashed rgba(56, 189, 248, 0.85);
+  border-radius: 50% / 60%;
+  pointer-events: none;
+  animation: pulseReticle 2s infinite ease-in-out;
+}
+
+@keyframes pulseReticle {
+  0%, 100% { border-color: rgba(56, 189, 248, 0.85); transform: translate(-50%, -50%) scale(1); }
+  50% { border-color: rgba(34, 197, 94, 0.95); transform: translate(-50%, -50%) scale(1.05); }
+}
+
+.doc-header-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e2e8f0;
+}
+

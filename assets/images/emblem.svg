@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" width="100" height="120">
+  <!-- Official Ashoka Stambha / National Health Crest Stylized Vector -->
+  <g fill="#0b2447">
+    <!-- Top Lions Stylized Crown -->
+    <path d="M50 8 C40 8, 38 16, 38 22 C34 23, 30 26, 30 32 C30 38, 35 42, 40 44 C40 46, 38 52, 42 56 C46 60, 48 60, 50 60 C52 60, 54 60, 58 56 C62 52, 60 46, 60 44 C65 42, 70 38, 70 32 C70 26, 66 23, 62 22 C62 16, 60 8, 50 8 Z" fill="#0b2447"/>
+    <circle cx="50" cy="22" r="5" fill="#f59e0b"/>
+    <circle cx="42" cy="30" r="3" fill="#f59e0b"/>
+    <circle cx="58" cy="30" r="3" fill="#f59e0b"/>
+    <!-- Abacus Base -->
+    <rect x="25" y="62" width="50" height="6" rx="2" fill="#0b2447"/>
+    <!-- Ashoka Chakra (Dharma Wheel) in Center -->
+    <circle cx="50" cy="76" r="8" fill="none" stroke="#0284c7" stroke-width="2"/>
+    <circle cx="50" cy="76" r="2" fill="#0284c7"/>
+    <!-- Chakra Spokes -->
+    <line x1="50" y1="68" x2="50" y2="84" stroke="#0284c7" stroke-width="1"/>
+    <line x1="42" y1="76" x2="58" y2="76" stroke="#0284c7" stroke-width="1"/>
+    <line x1="44" y1="70" x2="56" y2="82" stroke="#0284c7" stroke-width="1"/>
+    <line x1="44" y1="82" x2="56" y2="70" stroke="#0284c7" stroke-width="1"/>
+    <!-- Flanking Guardian Animals (Horse & Bull stylization) -->
+    <path d="M28 73 C26 71, 24 74, 25 78 C27 80, 31 80, 32 76 Z" fill="#0b2447"/>
+    <path d="M72 73 C74 71, 76 74, 75 78 C73 80, 69 80, 68 76 Z" fill="#0b2447"/>
+    <!-- Bottom Pedestal with Inscription Bar -->
+    <rect x="20" y="85" width="60" height="5" rx="1.5" fill="#0b2447"/>
+    <!-- Satyam Eva Jayate / National Motto Text Representation -->
+    <rect x="24" y="93" width="52" height="3" rx="1" fill="#f59e0b"/>
+    <!-- Lotus Base -->
+    <path d="M30 99 C40 106, 60 106, 70 99 C66 109, 34 109, 30 99 Z" fill="#0b2447"/>
+    <rect x="35" y="108" width="30" height="4" rx="2" fill="#0b2447"/>
+  </g>
+</svg>

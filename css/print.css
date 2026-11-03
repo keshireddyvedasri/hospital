@@ -1,0 +1,84 @@
+/* ==========================================================================
+   e-Arogya: Print Stylesheet for Official OP Tickets & Prescriptions
+   ========================================================================== */
+
+@media print {
+  /* Hide non-printable interface chrome */
+  .govt-accessibility-bar,
+  .govt-navbar,
+  .demo-role-bar,
+  .govt-footer,
+  .no-print,
+  .btn,
+  .modal-backdrop,
+  .nav,
+  .alert-dismissible .btn-close {
+    display: none !important;
+  }
+
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .container, .container-fluid {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Printable OP Ticket Container */
+  .printable-area {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+    padding: 10mm !important;
+    box-sizing: border-box !important;
+  }
+
+  .op-slip-ticket {
+    border: 2px solid #000000 !important;
+    box-shadow: none !important;
+    padding: 16px !important;
+    page-break-inside: avoid !important;
+    background: transparent !important;
+  }
+
+  .op-slip-header {
+    border-bottom: 2px solid #000000 !important;
+  }
+
+  .op-token-banner {
+    background: #f1f5f9 !important;
+    color: #000000 !important;
+    border: 1px solid #000000 !important;
+  }
+
+  .patient-avatar-frame {
+    border: 1px solid #000000 !important;
+    box-shadow: none !important;
+  }
+
+  .op-qr-frame {
+    border: 1px solid #000000 !important;
+    box-shadow: none !important;
+  }
+
+  .table {
+    border-color: #000000 !important;
+  }
+
+  .table td, .table th {
+    border-color: #333333 !important;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
+  }
+}
+
