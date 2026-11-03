@@ -37,7 +37,7 @@ export default function RoleSwitcher({ currentRole, staffCategory, onSwitchRole,
               onClick={() => onSwitchRole('doctor', 'DH-2026-001')}
             >
               <Stethoscope size={15} />
-              <span>{t('doctorRole') || 'Doctor (Dr. Rajesh)'}</span>
+              <span>{t('doctorRole') || 'Doctor Portal'}</span>
             </button>
 
             {/* Staff: Receptionist Category */}

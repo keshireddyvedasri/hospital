@@ -45,13 +45,119 @@ body {
   flex-direction: column;
 }
 
-/* --- Top Utility Bar (Clean White Background) --- */
+/* --- Top Utility Bar (Clean White Background with Highlighted Moving Emergency Ticker) --- */
 .top-utility-bar {
   background-color: #ffffff;
   color: #334155;
   font-size: 0.92rem;
-  padding: 8px 0;
+  padding: 6px 0;
   border-bottom: 1px solid #e2e8f0;
+  overflow: hidden;
+}
+
+/* Emergency Highlight & Moving Ticker */
+.emergency-highlight-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.emergency-alert-badge {
+  background: linear-gradient(135deg, #b91c1c, #ef4444);
+  color: #ffffff;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.35);
+  animation: pulseEmergency 2s infinite ease-in-out;
+  flex-shrink: 0;
+}
+
+@keyframes pulseEmergency {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.45);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(239, 68, 68, 0);
+    transform: scale(1.02);
+  }
+}
+
+.emergency-ticker-container {
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  mask-image: linear-gradient(to right, transparent, black 15px, black calc(100% - 15px), transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 15px, black calc(100% - 15px), transparent);
+}
+
+.emergency-ticker-track {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  animation: marqueeTicker 25s linear infinite;
+  will-change: transform;
+}
+
+.emergency-ticker-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes marqueeTicker {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.emergency-ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding-right: 28px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.emergency-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 2px 9px;
+  border-radius: 6px;
+  color: #1e293b;
+}
+
+.emergency-chip strong {
+  color: #0f2b48;
+}
+
+.emergency-chip-red {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.emergency-chip-red strong {
+  color: #b91c1c;
 }
 
 .font-scaler-btn {

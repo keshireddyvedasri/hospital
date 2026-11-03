@@ -1,5 +1,5 @@
 import React from 'react';
-import { Phone, Hospital, Sun, Moon, PlusCircle, Droplet, Languages, Stethoscope } from 'lucide-react';
+import { Phone, Hospital, Sun, Moon, PlusCircle, Droplet, Languages, AlertTriangle } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function Navbar({ onBookOP, onOpenBloodRequest, onHomeClick, onDoctorPortal, fontSize, setFontSize, highContrast, setHighContrast }) {
@@ -7,30 +7,60 @@ export default function Navbar({ onBookOP, onOpenBloodRequest, onHomeClick, onDo
 
   return (
     <>
-      {/* Top Utility Bar in Clean White (No dark blue bar) */}
+      {/* Top Utility Bar with Highlighted Moving Emergency Ticker */}
       <div className="top-utility-bar bg-white border-bottom no-print">
         <div className="container-fluid px-lg-5">
-          <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 py-1">
+          <div className="d-flex justify-content-between align-items-center gap-3 py-1">
             
-            {/* MGM Casualty & Emergency Info in Clean White Bar */}
-            <div className="d-flex align-items-center gap-2 flex-wrap">
-              <span className="d-flex align-items-center gap-1 text-dark">
-                <Phone size={15} className="text-danger flex-shrink-0" />
-                <span>
-                  MGM Casualty: <strong className="text-danger">0870-2441010</strong> &bull; Emergency: <strong className="text-danger">108</strong>
-                </span>
-              </span>
-              <span className="text-muted d-none d-sm-inline">
-                | Blood Bank: <strong className="text-dark">0870-2441012 / 1910</strong>
-              </span>
-              <span className="badge bg-light text-secondary border d-none d-md-inline">
-                Warangal, Telangana
-              </span>
+            {/* Highlighted Emergency Marquee / Moving Ticker */}
+            <div className="emergency-highlight-wrapper">
+              <div className="emergency-alert-badge">
+                <AlertTriangle size={13} className="text-white flex-shrink-0" />
+                <span>CASUALTY 24x7</span>
+              </div>
+
+              <div className="emergency-ticker-container" title="24/7 Government MGM Hospital Emergency & Casualty Contacts">
+                <div className="emergency-ticker-track">
+                  {/* Sequence 1 */}
+                  <div className="emergency-ticker-item">
+                    <span className="emergency-chip">
+                      <Phone size={13} className="text-danger flex-shrink-0" />
+                      <span>MGM Casualty: <strong className="text-danger">0870-2441010</strong></span>
+                    </span>
+                    <span className="emergency-chip emergency-chip-red">
+                      <span>Emergency: <strong className="text-danger">108</strong></span>
+                    </span>
+                    <span className="emergency-chip">
+                      <span>Blood Bank: <strong>0870-2441012 / 1910</strong></span>
+                    </span>
+                    <span className="emergency-chip text-muted">
+                      <span>Warangal, Telangana</span>
+                    </span>
+                  </div>
+
+                  {/* Sequence 2 for seamless loop */}
+                  <div className="emergency-ticker-item" aria-hidden="true">
+                    <span className="emergency-chip">
+                      <Phone size={13} className="text-danger flex-shrink-0" />
+                      <span>MGM Casualty: <strong className="text-danger">0870-2441010</strong></span>
+                    </span>
+                    <span className="emergency-chip emergency-chip-red">
+                      <span>Emergency: <strong className="text-danger">108</strong></span>
+                    </span>
+                    <span className="emergency-chip">
+                      <span>Blood Bank: <strong>0870-2441012 / 1910</strong></span>
+                    </span>
+                    <span className="emergency-chip text-muted">
+                      <span>Warangal, Telangana</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Accessibility: Font Scaler & Contrast */}
-            <div className="d-flex align-items-center gap-2">
-              <span className="text-muted small me-1">{t('textSize')}</span>
+            <div className="d-flex align-items-center gap-2 flex-shrink-0">
+              <span className="text-muted small me-1 d-none d-sm-inline">{t('textSize')}</span>
               <button 
                 type="button" 
                 className={`font-scaler-btn ${fontSize === 15 ? 'active' : ''}`}
@@ -110,15 +140,6 @@ export default function Navbar({ onBookOP, onOpenBloodRequest, onHomeClick, onDo
                 </button>
               </div>
 
-              <button 
-                type="button" 
-                className="btn btn-outline-primary btn-sm d-flex align-items-center gap-1 shadow-sm fw-bold"
-                onClick={onDoctorPortal}
-                title="Doctor Chamber & Duty Portal"
-              >
-                <Stethoscope size={15} />
-                <span>Doctor Portal</span>
-              </button>
               <button 
                 type="button" 
                 className="btn btn-outline-danger btn-sm d-none d-sm-flex align-items-center gap-1"
